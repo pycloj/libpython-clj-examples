@@ -45,10 +45,45 @@
 
 ; (datasets = (py/$. keras datasets))
 (def fashion_mnist_data (py/call-attr fashion_mnist "load_data"))
-fashion_mnist_data
+
+(defmacro def+
+  "binding => binding-form
+  internalizes binding-forms as if by def.
+  See http://clojuredocs.org/clojure.core/destructure ."
+  {:added "1.9", :special-form true, :forms '[(def+ [bindings*])]}
+  [& bindings]
+  (let [bings (partition 2 (destructure bindings))]
+    (sequence cat
+              ['(do)
+               (map (fn [[var value]] `(def ~var ~value)) bings)
+               [(mapv (fn [[var _]] (str var)) bings)]])))
+
+(def+ [[train-images , train-labels], [test-images, test-labels]] (vec fashion_mnist_data))
 
 
+(def class-names  (py/->py-list ["T-shirt/top", "Trouser", "Pullover", "Dress", "Coat"
+                    "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot"]))
 
+
+(py/$. train-images shape)
+
+; learn how 
+(require-python '[builtins :refer [len]] )
+(len train-images)
+train-labels
+
+(py/$. test-images shape)
+
+(len test-images)
+(len test-labels)
+
+
+(def mfig (py/import-module "matplotlib.figure"))
+(def plt (py/import-module "matplotlib.pyplot"))
+; (def fig (py/call-attr plt "figure"))
+;(py/call-attr plt "figure")
+; (py/call-attr plt "imshow" (train_images [0]))
+; (py/as-list class_names)
 ;; => Syntax error compiling at (27.clj:39:1).
 ;;    Unable to resolve symbol: keras in this context
 
