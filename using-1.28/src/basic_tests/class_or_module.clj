@@ -2,7 +2,8 @@
   (:require [notespace.note :as note
              :refer [note note-void
                      note-md note-hiccup
-                     note-as-md note-as-hiccup]]))
+                     note-as-md note-as-hiccup]]
+            [libpython-clj.python :as py]))
 
 
 
@@ -24,9 +25,6 @@
                     python-type] :as py]
           '[basic-tests.utils :refer [def+ matplotlib->svg]]))
 
-
-(note
- (initialize!))
 
 (note-md "the dot in python has multiple meanings
 what are the elements between the dots :
@@ -56,10 +54,12 @@ The best way to implement in clojure
 ")
  
 
-
 (note 
  (py/import-as tensorflow tf)
  (py/import-as tensorflow_datasets tfds)
  (def train ( py/$.. tfds Split TRAIN ))
- (py/call-attr train "subsplit" '(6 4)))
+ (py/call-attr train "subsplit" (py/->py-list [6 4])))
+
 (note/render-this-ns!)
+
+

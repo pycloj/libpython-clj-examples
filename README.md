@@ -6,3 +6,4 @@ This repository has a siries of examples using libpython-clj in different versio
 
 * using 1.28
   * [keras experiment #1](./using-1.28/resources/public/basic-tests/keras-test/index.html)
+  * [dot ambiguity](./using-1.28/resources/public/basic-tests/class-or-module/index.html)
