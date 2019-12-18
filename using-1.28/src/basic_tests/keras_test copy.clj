@@ -36,9 +36,10 @@
 (py/import-as tensorflow tf)
 (py/import-as tensorflow.keras keras)
 (py/import-as matplotlib.pyplot plt)
-(py/import-as keras.datasets.fashion_mnist fashion_mnist)
+(py/import-as numpy np)
+(py/import-as tensorflow.keras.datasets.fashion_mnist fashion_mnist)
 ; (py/import-from keras.datasets.fashion_mnist load_data)
-(py/import-as keras.layers keras-layers)
+(py/import-as tensorflow.keras.layers keras-layers)
 
 (py/$. tf __version__)
 (py/$. keras __version__)
@@ -68,6 +69,7 @@ fashion_mnist_data
 
 (py/$. train-images shape)
 
+
 ; learn how 
 (require-python '[builtins :refer [len]] )
 (len train-images)
@@ -89,18 +91,22 @@ train-labels
 ;;    Unable to resolve symbol: keras in this context
 
 ;; the following code fails - consider using pantera 
-; (train-images (/ train-images 255.0))
-; (test-images (/ test-images 255.0))
-
-(def flatten (py/call-attr-kw keras-layers "Flatten" [] {:input_shape   [28,28]}))
-(def dense (py/call-attr-kw keras-layers "Dense" [128] {:activation  "relu"}))
-(def last-dense (py/call-attr-kw keras-layers "Dense" [10] {:activation "softmax"}))
 
 
-(defonce model (py/call-attr  keras "Sequential" [ (py/call-attr-kw keras-layers "Flatten" [] {:input_shape   [28,28]}) ]))
+
+; (def train-images (py/call-attr train-images 255.0))
+(def test-images (py/call-attr np "divide" test-images 255.0))
+(def train-images (py/call-attr np "divide" train-images 255.0))
+
+; (def flatten (py/call-attr-kw keras-layers "Flatten" [] {:input_shape   [28,28]}))
+; (def dense (py/call-attr-kw keras-layers "Dense" [128] {:activation  "relu"}))
+; (def last-dense (py/call-attr-kw keras-layers "Dense" [10] {:activation "softmax"}))
+
+
+; (defonce model (py/call-attr  keras "Sequential" [ (py/call-attr-kw keras-layers "Flatten" [] {:input_shape   [28,28]}) ]))
 ;TypeError: The added layer must be an instance of class Layer. Found: <keras.layers.core.Flatten object at 0x667080590>
 
-(defonce model (py/call-attr  keras "Sequential" [ (py/call-attr-kw keras-layers "Layer" [] {:input_shape   [28,28]}) ]))
+; (defonce model (py/call-attr  keras "Sequential" [ (py/call-attr-kw keras-layers "Layer" [] {:input_shape   [28,28]}) ]))
 ;TypeError: The added layer must be an instance of class Layer. Found: <keras.engine.base_layer.Layer object at 0x662ac1890>
 
 
@@ -108,9 +114,9 @@ train-labels
 
 ; (py/call-attr model "add"  (py/call-attr-kw keras-layers "Dense" [128] {:activation  "relu"}) )
 ; (py/call-attr model "add"  (py/call-attr-kw keras-layers "Dense" [10] {:activation "softmax"}) )
-; (def model (py/call-attr  keras "Sequential" [(py/call-attr-kw keras-layers "Flatten" [] {:input_shape   [28,28]})
-;                                               (py/call-attr-kw keras-layers "Dense" [128] {:activation  "relu"})
-;                                               (py/call-attr-kw keras-layers "Dense" [10] {:activation "softmax"})]))
+(def model (py/call-attr  keras "Sequential" [(py/call-attr-kw keras-layers "Flatten" [] {:input_shape   [28,28]})
+                                              (py/call-attr-kw keras-layers "Dense" [128] {:activation  "relu"})
+                                              (py/call-attr-kw keras-layers "Dense" [10] {:activation "softmax"})]))
 
 
 (py/call-attr-kw  model "compile" [] {:optimizer "adam"
@@ -123,7 +129,11 @@ train-labels
 ;; => Syntax error compiling at (27.clj:35:1).
 ;;    No such namespace: py
 
+(py/call-attr-kw model "fit" [train-images, train-labels] {:epochs 10})
 
+
+(def test-res (py/call-attr-kw model "evaluate" [test-images test-labels] {:verbose 2}) )
+; (print test-res)
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
