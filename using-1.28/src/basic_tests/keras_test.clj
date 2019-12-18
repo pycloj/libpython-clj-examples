@@ -4,6 +4,11 @@
                      note-md note-hiccup
                      note-as-md note-as-hiccup]]))
 
+(note-md "Experimenting with libpython-clj 1.28,
+mixing the different ways to consume python modules.
+
+Based on: https://www.tensorflow.org/tutorials/keras/classification")
+
 (note
  (require '[libpython-clj.require :as req :refer [require-python]
             :reload true]
@@ -20,10 +25,7 @@
                     python-type] :as py]
           '[basic-tests.utils :refer [def+ matplotlib->svg]]))
 
-(note-md "Experimenting with libpython-clj 1.28,
-mixing the different ways to consume python modules.
 
-Based on: https://www.tensorflow.org/tutorials/keras/classification")
 
 (note
  (initialize!))
