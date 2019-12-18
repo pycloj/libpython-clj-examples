@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html><body style="background-color:#dddddd;"><head><script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js" type="text/javascript"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/lang-clj.js" type="text/javascript"></script></head><div><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">(require</br>&nbsp;&nbsp;(quote&nbsp;[libpython-clj.require&nbsp;:as&nbsp;req</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:refer&nbsp;[require-python]</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:reload&nbsp;true])</br>&nbsp;&nbsp;(quote</br>&nbsp;&nbsp;&nbsp;&nbsp;[libpython-clj.python&nbsp;:refer</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[as-python&nbsp;as-jvm&nbsp;->python&nbsp;->jvm</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get-attr&nbsp;call-attr&nbsp;call-attr-kw</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get-item&nbsp;att-type-map&nbsp;call&nbsp;call-kw</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;initialize!&nbsp;as-numpy&nbsp;as-tensor</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;->numpy&nbsp;run-simple-string</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;add-module&nbsp;module-dict</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;import-module&nbsp;python-type]&nbsp;:as</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;py])</br>&nbsp;&nbsp;(quote&nbsp;[basic-tests.utils&nbsp;:refer</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[def+&nbsp;matplotlib->svg]]))</br></br></code></div></div></p><code class="prettyprint lang-clj">nil</br></code></p><p><div><p>Experimenting with libpython-clj 1.28, mixing the different ways to consume python modules.</p><p>Based on: https://www.tensorflow.org/tutorials/keras/classification</p></div></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">(initialize!)</br></br></code></div></div></p><code class="prettyprint lang-clj">:ok</br></code></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">(require-python&nbsp;(quote&nbsp;[builtins&nbsp;:refer</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[len]]))</br></br></code></div><div><code class="prettyprint lang-clj">(py/import-as&nbsp;tensorflow&nbsp;tf)</br></br></code></div><div><code class="prettyprint lang-clj">(py/import-as&nbsp;tensorflow.keras&nbsp;keras)</br></br></code></div><div><code class="prettyprint lang-clj">(require-python</br>&nbsp;&nbsp;(quote&nbsp;[matplotlib.pyplot&nbsp;:as&nbsp;plt]))</br></br></code></div><div><code class="prettyprint lang-clj">(py/import-as&nbsp;numpy&nbsp;np)</br></br></code></div><div><code class="prettyprint lang-clj">(py/import-as</br>&nbsp;&nbsp;tensorflow.keras.datasets.fashion_mnist</br>&nbsp;&nbsp;fashion_mnist)</br></br></code></div><div><code class="prettyprint lang-clj">(py/import-as&nbsp;tensorflow.keras.layers</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;keras-layers)</br></br></code></div></div></p></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">(py/$.&nbsp;tf&nbsp;__version__)</br></br></code></div><div><code class="prettyprint lang-clj">(py/$.&nbsp;keras&nbsp;__version__)</br></br></code></div></div></p><code class="prettyprint lang-clj">"2.2.4-tf"</br></code></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">(def&nbsp;fashion_mnist_data</br>&nbsp;&nbsp;(py/call-attr&nbsp;fashion_mnist</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"load_data"))</br></br></code></div></div></p><code class="prettyprint lang-clj">((array([[[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...,</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0]],</br></br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...,</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0]],</br></br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...,</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0]],</br></br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...,</br></br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...,</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0]],</br></br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...,</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0]],</br></br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...,</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0]]],&nbsp;dtype=uint8),&nbsp;array([9,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;3,&nbsp;0,&nbsp;5],&nbsp;dtype=uint8)),&nbsp;(array([[[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...,</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0]],</br></br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...,</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0]],</br></br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...,</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0]],</br></br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...,</br></br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...,</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0]],</br></br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...,</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0]],</br></br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...,</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0],</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0,&nbsp;0,&nbsp;0,&nbsp;...,&nbsp;0,&nbsp;0,&nbsp;0]]],&nbsp;dtype=uint8),&nbsp;array([9,&nbsp;2,&nbsp;1,&nbsp;...,&nbsp;8,&nbsp;1,&nbsp;5],&nbsp;dtype=uint8)))</br></code></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">(def+&nbsp;[[train-images&nbsp;train-labels]</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[test-images&nbsp;test-labels]]</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(vec&nbsp;fashion_mnist_data))</br></br></code></div></div></p></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">train-images</br></br></code></div></div></p><code class="prettyprint lang-clj">[[[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]]</br></br>&nbsp;[[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]]</br></br>&nbsp;[[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]]</br></br>&nbsp;...</br></br>&nbsp;[[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]]</br></br>&nbsp;[[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]]</br></br>&nbsp;[[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]]]</br></code></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">train-labels</br></br></code></div></div></p><code class="prettyprint lang-clj">[9&nbsp;0&nbsp;0&nbsp;...&nbsp;3&nbsp;0&nbsp;5]</br></code></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">test-images</br></br></code></div></div></p><code class="prettyprint lang-clj">[[[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]]</br></br>&nbsp;[[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]]</br></br>&nbsp;[[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]]</br></br>&nbsp;...</br></br>&nbsp;[[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]]</br></br>&nbsp;[[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]]</br></br>&nbsp;[[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]</br>&nbsp;&nbsp;[0&nbsp;0&nbsp;0&nbsp;...&nbsp;0&nbsp;0&nbsp;0]]]</br></code></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">test-labels</br></br></code></div></div></p><code class="prettyprint lang-clj">[9&nbsp;2&nbsp;1&nbsp;...&nbsp;8&nbsp;1&nbsp;5]</br></code></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">(def&nbsp;class-names</br>&nbsp;&nbsp;(py/->py-list</br>&nbsp;&nbsp;&nbsp;&nbsp;["T-shirt/top"&nbsp;"Trouser"&nbsp;"Pullover"</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Dress"&nbsp;"Coat"&nbsp;"Sandal"&nbsp;"Shirt"</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Sneaker"&nbsp;"Bag"&nbsp;"Ankle&nbsp;boot"]))</br></br></code></div></div></p><code class="prettyprint lang-clj">['T-shirt/top',&nbsp;'Trouser',&nbsp;'Pullover',&nbsp;'Dress',&nbsp;'Coat',&nbsp;'Sandal',&nbsp;'Shirt',&nbsp;'Sneaker',&nbsp;'Bag',&nbsp;'Ankle&nbsp;boot']</br></code></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">(py/$.&nbsp;train-images&nbsp;shape)</br></br></code></div></div></p><code class="prettyprint lang-clj">(60000,&nbsp;28,&nbsp;28)</br></code></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">[(len&nbsp;train-images)&nbsp;(len&nbsp;train-labels)]</br></br></code></div></div></p><code class="prettyprint lang-clj">[60000&nbsp;60000]</br></code></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">(py/$.&nbsp;test-images&nbsp;shape)</br></br></code></div></div></p><code class="prettyprint lang-clj">(10000,&nbsp;28,&nbsp;28)</br></code></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">[(len&nbsp;test-images)&nbsp;(len&nbsp;test-labels)]</br></br></code></div></div></p><code class="prettyprint lang-clj">[10000&nbsp;10000]</br></code></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">(matplotlib->svg</br>&nbsp;&nbsp;(fn&nbsp;[]</br>&nbsp;&nbsp;&nbsp;&nbsp;(plt/imshow&nbsp;(first&nbsp;train-images))</br>&nbsp;&nbsp;&nbsp;&nbsp;(plt/colorbar)</br>&nbsp;&nbsp;&nbsp;&nbsp;(plt/grid&nbsp;false)))</br></br></code></div></div></p><?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Created with matplotlib (https://matplotlib.org/) -->
+<svg height="345.6pt" version="1.1" viewBox="0 0 460.8 345.6" width="460.8pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+*{stroke-linecap:butt;stroke-linejoin:round;}
+  </style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 345.6 
+L 460.8 345.6 
+L 460.8 0 
+L 0 0 
+z
+" style="fill:#ffffff;"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 77.184 307.584 
+L 343.296 307.584 
+L 343.296 41.472 
+L 77.184 41.472 
+z
+" style="fill:#ffffff;"/>
+   </g>
+   <g clip-path="url(#p83943cfb90)">
+    <image height="266.4" id="image9e55fdf7f1" transform="scale(1 -1)translate(0 -266.4)" width="266.4" x="77.184" xlink:href="data:image/png;base64,
+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" y="-41.184"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <defs>
+       <path d="M 0 0 
+L 0 3.5 
+" id="md53c694fda" style="stroke:#000000;stroke-width:0.8;"/>
+      </defs>
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="81.936" xlink:href="#md53c694fda" y="307.584"/>
+      </g>
+     </g>
+     <g id="text_1">
+      <!-- 0 -->
+      <defs>
+       <path d="M 31.78125 66.40625 
+Q 24.171875 66.40625 20.328125 58.90625 
+Q 16.5 51.421875 16.5 36.375 
+Q 16.5 21.390625 20.328125 13.890625 
+Q 24.171875 6.390625 31.78125 6.390625 
+Q 39.453125 6.390625 43.28125 13.890625 
+Q 47.125 21.390625 47.125 36.375 
+Q 47.125 51.421875 43.28125 58.90625 
+Q 39.453125 66.40625 31.78125 66.40625 
+z
+M 31.78125 74.21875 
+Q 44.046875 74.21875 50.515625 64.515625 
+Q 56.984375 54.828125 56.984375 36.375 
+Q 56.984375 17.96875 50.515625 8.265625 
+Q 44.046875 -1.421875 31.78125 -1.421875 
+Q 19.53125 -1.421875 13.0625 8.265625 
+Q 6.59375 17.96875 6.59375 36.375 
+Q 6.59375 54.828125 13.0625 64.515625 
+Q 19.53125 74.21875 31.78125 74.21875 
+z
+" id="DejaVuSans-48"/>
+      </defs>
+      <g transform="translate(78.75475 322.182437)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-48"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_2">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="129.456" xlink:href="#md53c694fda" y="307.584"/>
+      </g>
+     </g>
+     <g id="text_2">
+      <!-- 5 -->
+      <defs>
+       <path d="M 10.796875 72.90625 
+L 49.515625 72.90625 
+L 49.515625 64.59375 
+L 19.828125 64.59375 
+L 19.828125 46.734375 
+Q 21.96875 47.46875 24.109375 47.828125 
+Q 26.265625 48.1875 28.421875 48.1875 
+Q 40.625 48.1875 47.75 41.5 
+Q 54.890625 34.8125 54.890625 23.390625 
+Q 54.890625 11.625 47.5625 5.09375 
+Q 40.234375 -1.421875 26.90625 -1.421875 
+Q 22.3125 -1.421875 17.546875 -0.640625 
+Q 12.796875 0.140625 7.71875 1.703125 
+L 7.71875 11.625 
+Q 12.109375 9.234375 16.796875 8.0625 
+Q 21.484375 6.890625 26.703125 6.890625 
+Q 35.15625 6.890625 40.078125 11.328125 
+Q 45.015625 15.765625 45.015625 23.390625 
+Q 45.015625 31 40.078125 35.4375 
+Q 35.15625 39.890625 26.703125 39.890625 
+Q 22.75 39.890625 18.8125 39.015625 
+Q 14.890625 38.140625 10.796875 36.28125 
+z
+" id="DejaVuSans-53"/>
+      </defs>
+      <g transform="translate(126.27475 322.182437)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-53"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_3">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="176.976" xlink:href="#md53c694fda" y="307.584"/>
+      </g>
+     </g>
+     <g id="text_3">
+      <!-- 10 -->
+      <defs>
+       <path d="M 12.40625 8.296875 
+L 28.515625 8.296875 
+L 28.515625 63.921875 
+L 10.984375 60.40625 
+L 10.984375 69.390625 
+L 28.421875 72.90625 
+L 38.28125 72.90625 
+L 38.28125 8.296875 
+L 54.390625 8.296875 
+L 54.390625 0 
+L 12.40625 0 
+z
+" id="DejaVuSans-49"/>
+      </defs>
+      <g transform="translate(170.6135 322.182437)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-49"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_4">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="224.496" xlink:href="#md53c694fda" y="307.584"/>
+      </g>
+     </g>
+     <g id="text_4">
+      <!-- 15 -->
+      <g transform="translate(218.1335 322.182437)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-49"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-53"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_5">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="272.016" xlink:href="#md53c694fda" y="307.584"/>
+      </g>
+     </g>
+     <g id="text_5">
+      <!-- 20 -->
+      <defs>
+       <path d="M 19.1875 8.296875 
+L 53.609375 8.296875 
+L 53.609375 0 
+L 7.328125 0 
+L 7.328125 8.296875 
+Q 12.9375 14.109375 22.625 23.890625 
+Q 32.328125 33.6875 34.8125 36.53125 
+Q 39.546875 41.84375 41.421875 45.53125 
+Q 43.3125 49.21875 43.3125 52.78125 
+Q 43.3125 58.59375 39.234375 62.25 
+Q 35.15625 65.921875 28.609375 65.921875 
+Q 23.96875 65.921875 18.8125 64.3125 
+Q 13.671875 62.703125 7.8125 59.421875 
+L 7.8125 69.390625 
+Q 13.765625 71.78125 18.9375 73 
+Q 24.125 74.21875 28.421875 74.21875 
+Q 39.75 74.21875 46.484375 68.546875 
+Q 53.21875 62.890625 53.21875 53.421875 
+Q 53.21875 48.921875 51.53125 44.890625 
+Q 49.859375 40.875 45.40625 35.40625 
+Q 44.1875 33.984375 37.640625 27.21875 
+Q 31.109375 20.453125 19.1875 8.296875 
+z
+" id="DejaVuSans-50"/>
+      </defs>
+      <g transform="translate(265.6535 322.182437)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_6">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="319.536" xlink:href="#md53c694fda" y="307.584"/>
+      </g>
+     </g>
+     <g id="text_6">
+      <!-- 25 -->
+      <g transform="translate(313.1735 322.182437)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-53"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_7">
+      <defs>
+       <path d="M 0 0 
+L -3.5 0 
+" id="mcde9b573a6" style="stroke:#000000;stroke-width:0.8;"/>
+      </defs>
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="77.184" xlink:href="#mcde9b573a6" y="46.224"/>
+      </g>
+     </g>
+     <g id="text_7">
+      <!-- 0 -->
+      <g transform="translate(63.8215 50.023219)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-48"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_8">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="77.184" xlink:href="#mcde9b573a6" y="93.744"/>
+      </g>
+     </g>
+     <g id="text_8">
+      <!-- 5 -->
+      <g transform="translate(63.8215 97.543219)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-53"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_9">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="77.184" xlink:href="#mcde9b573a6" y="141.264"/>
+      </g>
+     </g>
+     <g id="text_9">
+      <!-- 10 -->
+      <g transform="translate(57.459 145.063219)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-49"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_10">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="77.184" xlink:href="#mcde9b573a6" y="188.784"/>
+      </g>
+     </g>
+     <g id="text_10">
+      <!-- 15 -->
+      <g transform="translate(57.459 192.583219)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-49"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-53"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_11">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="77.184" xlink:href="#mcde9b573a6" y="236.304"/>
+      </g>
+     </g>
+     <g id="text_11">
+      <!-- 20 -->
+      <g transform="translate(57.459 240.103219)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_6">
+     <g id="line2d_12">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="77.184" xlink:href="#mcde9b573a6" y="283.824"/>
+      </g>
+     </g>
+     <g id="text_12">
+      <!-- 25 -->
+      <g transform="translate(57.459 287.623219)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-53"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="patch_3">
+    <path d="M 77.184 307.584 
+L 77.184 41.472 
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 343.296 307.584 
+L 343.296 41.472 
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 77.184 307.584 
+L 343.296 307.584 
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 77.184 41.472 
+L 343.296 41.472 
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"/>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_7">
+    <path clip-path="url(#p10b40e9341)" d="M 361.152 307.584 
+L 361.152 306.5445 
+L 361.152 42.5115 
+L 361.152 41.472 
+L 374.4576 41.472 
+L 374.4576 42.5115 
+L 374.4576 306.5445 
+L 374.4576 307.584 
+z
+" style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:miter;stroke-width:0.01;"/>
+   </g>
+   <image height="265.68" id="imageb36949e764" transform="scale(1 -1)translate(0 -265.68)" width="12.96" x="361.44" xlink:href="data:image/png;base64,
+iVBORw0KGgoAAAANSUhEUgAAABIAAAFxCAYAAAB+2fgXAAAABHNCSVQICAgIfAhkiAAAAeVJREFUeJztncmNw0AQA2ckheYQNv9QLIfQ8ygsCgQ7AEI8+jAs2Puz/94F1LP2ReCsZ18bAWIeZ5XaGRBE7VnbptG+KI101FYyNSiQG2oRITXKNaX9uclOdi2XWjftVE32CZCO2ou5Bj1TcCBr/1zB9ge7Fq0Rg2NM9pvbtG+ua1QgsRYhDy0ISEiNc40BEibbSI0Coj5CBGtkpFbXJiAjNZlrwhuSOv2M1DjXbEdEciBt1JSDDQKKpmZr2rr2j0DBGpXaWEJq3bQzEPIS26r9J+Wzv9Tm8o3aajRXqc3VUXsApKNWjeZq0x4ABVNbm7lrszVigDqP5vIl2+eaT2yfRkL7g+dRcNPqjohkjaCvRVBq0H2U3LQrOJCx9kdTg4B8oxZzzTdqdYHEngjUCAPyUctN9sVRq2sTECW2UKNLd2jVtRmo1A6AhMmWaSRcR8nUdIHUuVb75zJS218EyEitro1At69pIdeSk30Lkw0FktNImGyZRhy1O5galmxd03LUsHWk06jUZiCq+5Wb1kZNN4+wJxJuWt8RAW5am2sYNZ9rYCBzZ3buPKJ2P5Yj4Toy3keyIyJbIxs1rml1byCA84gpch5RQNB7Q0qNMGq2Hy4BXdNR41yz/cEEJfZzUz96r9PoB0okjeQ8y9TkAAAAAElFTkSuQmCC" y="-41.76"/>
+   <g id="matplotlib.axis_3"/>
+   <g id="matplotlib.axis_4">
+    <g id="ytick_7">
+     <g id="line2d_13">
+      <defs>
+       <path d="M 0 0 
+L 3.5 0 
+" id="m32c0be5209" style="stroke:#000000;stroke-width:0.8;"/>
+      </defs>
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="374.4576" xlink:href="#m32c0be5209" y="307.584"/>
+      </g>
+     </g>
+     <g id="text_13">
+      <!-- 0 -->
+      <g transform="translate(381.4576 311.383219)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-48"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_8">
+     <g id="line2d_14">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="374.4576" xlink:href="#m32c0be5209" y="255.405176"/>
+      </g>
+     </g>
+     <g id="text_14">
+      <!-- 50 -->
+      <g transform="translate(381.4576 259.204395)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-53"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_9">
+     <g id="line2d_15">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="374.4576" xlink:href="#m32c0be5209" y="203.226353"/>
+      </g>
+     </g>
+     <g id="text_15">
+      <!-- 100 -->
+      <g transform="translate(381.4576 207.025572)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-49"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+       <use x="127.246094" xlink:href="#DejaVuSans-48"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_10">
+     <g id="line2d_16">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="374.4576" xlink:href="#m32c0be5209" y="151.047529"/>
+      </g>
+     </g>
+     <g id="text_16">
+      <!-- 150 -->
+      <g transform="translate(381.4576 154.846748)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-49"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-53"/>
+       <use x="127.246094" xlink:href="#DejaVuSans-48"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_11">
+     <g id="line2d_17">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="374.4576" xlink:href="#m32c0be5209" y="98.868706"/>
+      </g>
+     </g>
+     <g id="text_17">
+      <!-- 200 -->
+      <g transform="translate(381.4576 102.667925)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+       <use x="127.246094" xlink:href="#DejaVuSans-48"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_12">
+     <g id="line2d_18">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="374.4576" xlink:href="#m32c0be5209" y="46.689882"/>
+      </g>
+     </g>
+     <g id="text_18">
+      <!-- 250 -->
+      <g transform="translate(381.4576 50.489101)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-53"/>
+       <use x="127.246094" xlink:href="#DejaVuSans-48"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="patch_8">
+    <path d="M 361.152 307.584 
+L 361.152 306.5445 
+L 361.152 42.5115 
+L 361.152 41.472 
+L 374.4576 41.472 
+L 374.4576 42.5115 
+L 374.4576 306.5445 
+L 374.4576 307.584 
+z
+" style="fill:none;stroke:#000000;stroke-linejoin:miter;stroke-width:0.8;"/>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p83943cfb90">
+   <rect height="266.112" width="266.112" x="77.184" y="41.472"/>
+  </clipPath>
+  <clipPath id="p10b40e9341">
+   <rect height="266.112" width="13.3056" x="361.152" y="41.472"/>
+  </clipPath>
+ </defs>
+</svg>
+</p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">(def&nbsp;test-images</br>&nbsp;&nbsp;(py/call-attr&nbsp;np</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"divide"</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;test-images</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;255.0))</br></br></code></div></div></p><code class="prettyprint lang-clj">[[[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]]</br></br>&nbsp;[[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]]</br></br>&nbsp;[[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]]</br></br>&nbsp;...</br></br>&nbsp;[[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]]</br></br>&nbsp;[[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]]</br></br>&nbsp;[[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]]]</br></code></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">(def&nbsp;train-images</br>&nbsp;&nbsp;(py/call-attr&nbsp;np</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"divide"</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;train-images</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;255.0))</br></br></code></div></div></p><code class="prettyprint lang-clj">[[[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]]</br></br>&nbsp;[[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]]</br></br>&nbsp;[[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]]</br></br>&nbsp;...</br></br>&nbsp;[[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]]</br></br>&nbsp;[[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]]</br></br>&nbsp;[[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;...</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]</br>&nbsp;&nbsp;[0.&nbsp;0.&nbsp;0.&nbsp;...&nbsp;0.&nbsp;0.&nbsp;0.]]]</br></code></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">(def&nbsp;model</br>&nbsp;&nbsp;(py/call-attr</br>&nbsp;&nbsp;&nbsp;&nbsp;keras</br>&nbsp;&nbsp;&nbsp;&nbsp;"Sequential"</br>&nbsp;&nbsp;&nbsp;&nbsp;[(py/call-attr-kw&nbsp;keras-layers</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Flatten"</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[]</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{:input_shape</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[28&nbsp;28]})</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(py/call-attr-kw&nbsp;keras-layers</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Dense"</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[128]</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{:activation</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"relu"})</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(py/call-attr-kw&nbsp;keras-layers</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Dense"</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[10]</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{:activation</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"softmax"})]))</br></br></code></div></div></p></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">(py/call-attr-kw</br>&nbsp;&nbsp;model</br>&nbsp;&nbsp;"compile"</br>&nbsp;&nbsp;[]</br>&nbsp;&nbsp;{:optimizer&nbsp;"adam",</br>&nbsp;&nbsp;&nbsp;:loss</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"sparse_categorical_crossentropy",</br>&nbsp;&nbsp;&nbsp;:metrics&nbsp;(py/->py-list</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;["accuracy"])})</br></br></code></div></div></p><code class="prettyprint lang-clj">nil</br></code></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">(py/call-attr-kw&nbsp;model</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"fit"</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[train-images</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;train-labels]</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{:epochs&nbsp;3})</br></br></code></div></div></p><code class="prettyprint lang-clj"><tensorflow.python.keras.callbacks.History&nbsp;object&nbsp;at&nbsp;0x7fb7b0930390></br></code></p><p><p><div style="background-color:#f2f2f2; width: 100%"><div><code class="prettyprint lang-clj">(def&nbsp;test-res</br>&nbsp;&nbsp;(py/call-attr-kw&nbsp;model</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"evaluate"</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[test-images</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;test-labels]</br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{:verbose&nbsp;2}))</br></br></code></div></div></p><code class="prettyprint lang-clj">[0.3814873243808746,&nbsp;0.8636]</br></code></p><div><hr><i><small><a href="https://github.com/pycloj/libpython-clj-examples
+/tree/master/src/basic_tests/keras_test.clj">basic-tests.keras-test</a> - created by <a href="https://github.com/scicloj/notespace">notespace</a>, Wed Dec 18 16:36:31 IST 2019.</small></i></div></div></body></html>
