@@ -36,6 +36,7 @@
 (py/import-as tensorflow tf)
 (py/import-as tensorflow.keras keras)
 (py/import-as matplotlib.pyplot plt)
+(py/import-as numpy np)
 (py/import-as tensorflow.keras.datasets.fashion_mnist fashion_mnist)
 ; (py/import-from keras.datasets.fashion_mnist load_data)
 (py/import-as tensorflow.keras.layers keras-layers)
@@ -68,6 +69,7 @@ fashion_mnist_data
 
 (py/$. train-images shape)
 
+
 ; learn how 
 (require-python '[builtins :refer [len]] )
 (len train-images)
@@ -89,12 +91,16 @@ train-labels
 ;;    Unable to resolve symbol: keras in this context
 
 ;; the following code fails - consider using pantera 
-; (train-images (/ train-images 255.0))
-; (test-images (/ test-images 255.0))
 
-(def flatten (py/call-attr-kw keras-layers "Flatten" [] {:input_shape   [28,28]}))
-(def dense (py/call-attr-kw keras-layers "Dense" [128] {:activation  "relu"}))
-(def last-dense (py/call-attr-kw keras-layers "Dense" [10] {:activation "softmax"}))
+
+
+; (def train-images (py/call-attr train-images 255.0))
+(def test-images (py/call-attr np "divide" test-images 255.0))
+(def train-images (py/call-attr np "divide" train-images 255.0))
+
+; (def flatten (py/call-attr-kw keras-layers "Flatten" [] {:input_shape   [28,28]}))
+; (def dense (py/call-attr-kw keras-layers "Dense" [128] {:activation  "relu"}))
+; (def last-dense (py/call-attr-kw keras-layers "Dense" [10] {:activation "softmax"}))
 
 
 ; (defonce model (py/call-attr  keras "Sequential" [ (py/call-attr-kw keras-layers "Flatten" [] {:input_shape   [28,28]}) ]))
