@@ -50,7 +50,7 @@ type (tfds.Split.TRAIN)
 <class 'tensorflow_datasets.core.splits.NamedSplit'>
 ```
 
-The best way to implement in clojure
+The best way to implement in clojure seems to be:
 ")
  
 
