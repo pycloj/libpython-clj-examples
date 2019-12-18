@@ -1,5 +1,9 @@
 (ns basic-tests.utils
+  (:require [libpython-clj.require :as req :refer [require-python]
+              :reload true])
   (:import (java.io File)))
+
+(require-python '[matplotlib.pyplot :as plt])
 
 (defmacro def+
   "binding => binding-form

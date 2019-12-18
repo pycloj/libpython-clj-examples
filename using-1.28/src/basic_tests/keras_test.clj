@@ -2,10 +2,12 @@
   (:require [notespace.note :as note
              :refer [note note-void
                      note-md note-hiccup
-                     note-as-md note-as-hiccup]]))
+                     note-as-md note-as-hiccup]]
+            [clojure.java.io :as io]
+            [libpython-clj.python :as py])
+  (:import [java.io File]))
 
-(note-md "Experimenting with libpython-clj 1.28,
-mixing the different ways to consume python modules.
+(note-md "Experimenting with libpython-clj 1.28.
 
 Based on: https://www.tensorflow.org/tutorials/keras/classification")
 
@@ -17,7 +19,7 @@ Based on: https://www.tensorflow.org/tutorials/keras/classification")
                     ->python ->jvm
                     get-attr call-attr call-attr-kw
                     get-item att-type-map
-                    call call-kw initialize!
+                    call call-kw
                     as-numpy as-tensor ->numpy
                     run-simple-string
                     add-module module-dict
@@ -26,23 +28,16 @@ Based on: https://www.tensorflow.org/tutorials/keras/classification")
           '[basic-tests.utils :refer [def+ matplotlib->svg]]))
 
 
-
-(note
- (initialize!))
-
 (note-void
- (require-python '[builtins :refer [len]] )
- (py/import-as tensorflow tf)
- (py/import-as tensorflow.keras keras)
+ (require-python '[builtins :refer [len]])
+ (require-python '[tensorflow.keras :as keras])
  (require-python '[matplotlib.pyplot :as plt])
- (py/import-as numpy np)
+ (require-python '[numpy :as np])
  (py/import-as tensorflow.keras.datasets.fashion_mnist fashion_mnist)
-                                        ; (py/import-from keras.datasets.fashion_mnist load_data)
  (py/import-as tensorflow.keras.layers keras-layers))
 
-(note
- (py/$. tf __version__)
- (py/$. keras __version__))
+(note (py/$. (import-module "tensorflow") __version__))
+(note (py/$. (import-module "keras") __version__))
 
 (note
  (def fashion_mnist_data (py/call-attr fashion_mnist "load_data")))
@@ -81,32 +76,32 @@ Based on: https://www.tensorflow.org/tutorials/keras/classification")
     (plt/grid false))))
 
 (note
- (def test-images (py/call-attr np "divide" test-images 255.0)))
+ (def test-images (np/divide test-images 255.0)))
 
 (note
- (def train-images (py/call-attr np "divide" train-images 255.0)))
+ (def train-images (np/divide train-images 255.0)))
 
 (note
  (def model
-   (py/call-attr
+   (py/$a
     keras "Sequential"
-    [(py/call-attr-kw keras-layers "Flatten" [] {:input_shape [28,28]})
-     (py/call-attr-kw keras-layers "Dense" [128] {:activation "relu"})
-     (py/call-attr-kw keras-layers "Dense" [10] {:activation "softmax"})])))
+    [(py/$a keras-layers "Flatten" :input_shape [28 28])
+     (py/$a keras-layers "Dense" 128 :activation "relu")
+     (py/$a keras-layers "Dense" 10 :activation "softmax")])))
 
-(note
- (py/call-attr-kw
+(note-void
+ (py/$a
   model "compile"
-  [] {:optimizer "adam"
-      :loss      "sparse_categorical_crossentropy"
-      :metrics   (py/->py-list ["accuracy"])}))
+  :optimizer "adam"
+  :loss      "sparse_categorical_crossentropy"
+  :metrics   (py/->py-list ["accuracy"])))
 
-(note
- (py/call-attr-kw model "fit" [train-images, train-labels] {:epochs 3}))
+(note-void
+ (py/$a model "fit" train-images train-labels :epochs 3))
 
 (note
  (def test-res
-   (py/call-attr-kw model "evaluate" [test-images test-labels] {:verbose 2})))
+   (py/$a model "evaluate" test-images test-labels :verbose 2)))
 
 
 (note/render-this-ns!)
